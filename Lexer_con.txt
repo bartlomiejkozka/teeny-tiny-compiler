@@ -1,0 +1,9 @@
+This class will be transform the source code into tokens.
+
+Functions:
+    • __init__(source) ==> Copy the source code and set the current index and current letter of the source code.
+    • getToken()       ==> Return the current Token.
+    • nextChar()       ==> Process to the next char of source code.
+    • getNextChar()    ==> return the next char (to check what char is after current char).
+    • skipWhiteSpace()
+    • skipComment()
