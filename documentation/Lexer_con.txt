@@ -7,3 +7,4 @@ Functions:
     • getNextChar()    ==> return the next char (to check what char is after current char).
     • skipWhiteSpace()
     • skipComment()
+*********
