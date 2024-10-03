@@ -1,4 +1,5 @@
 from token import Token
+import re
 
 
 class lexer:
@@ -20,14 +21,23 @@ class lexer:
                 else:                         
                     token =  Token(tokenKind=Token.EQEQ)
             case ">":
-                if self.getNextChar() == "=": token = Token(tokenKind=Token.GTEQ)
-                else:                         token = Token(tokenKind=Token.GT)
+                if self.getNextChar() == "=": 
+                    token = Token(tokenKind=Token.GTEQ)
+                    self.nextChar()
+                else:                         
+                    token = Token(tokenKind=Token.GT)
             case "<":
-                if self.getNextChar() == "=": token = Token(tokenKind=Token.LTEQ)
-                else:                         token = Token(tokenKind=Token.LT)
+                if self.getNextChar() == "=": 
+                    token = Token(tokenKind=Token.LTEQ)
+                    self.nextChar()
+                else:                         
+                    token = Token(tokenKind=Token.LT)
             case "!":
-                if self.getNextChar() == "=": token = Token(tokenKind=Token.NOTEQ)
-                else:                         raise Exception("Wrong syntax!")
+                if self.getNextChar() == "=": 
+                    token = Token(tokenKind=Token.NOTEQ)
+                    self.nextChar()
+                else:                         
+                    raise Exception("Wrong syntax!")
             case "*":
                 token = Token(tokenKind=Token.ASTERISK)
             case "/":
@@ -41,26 +51,25 @@ class lexer:
                 elif self.getNextChar() == "0": token = Token(tokenKind=Token.EOF)
                 else:                           raise Exception("Wrong syntax!")
             case "\"":
+                self.nextChar()
+                startIdx = self.currIdx
+                while self.currChar != "\"":
+                    self.nextChar()
+                token = Token(self.source[startIdx : self.currIdx], Token.STRING)
+            case _ if re.match(r'[A-Za-z]', self.currChar):
+                startIdx = self.currIdx
+                while self.currChar.isalpha() is True:
+                    self.nextChar()
+                token = Token(self.source[startIdx : self.currIdx], Token.IDENT)
+            case _ if self.currChar.isnumeric() is True:
+                startIdx = self.currIdx
+                while self.currChar.isnumeric() is True or (self.currChar == "." and self.getNextChar().isnumeric() is True):
+                    
 
+            
+        self.nextChar()
 
-        
-        # if self.currChar == '=':
-        #     if self.getNextChar() == "=":
-        #         return Token(tokenKind=Token.EQEQ)
-        #     else: return Token(tokenKind=Token.EQEQ)
-        # elif self.currChar == ">":
-        #     if self.getNextChar() == "=":
-        #         return Token(tokenKind=Token.GTEQ)
-        #     else: return Token(tokenKinf=Token.GT)
-        # elif self.currChar == "<":
-        #     if self.getNextChar() == "=":
-        #         return Token(tokenKind=Token.LTEQ)
-        #     else: return Token(tokenKinf=Token.LT)
-        # elif self.currChar == "*":
-        #     return Token(tokenKind=Token.ASTERISK)
-        # elif self.currChar ==  
-
-
+            
 
     def nextChar(self):
         self.currIdx += 1
