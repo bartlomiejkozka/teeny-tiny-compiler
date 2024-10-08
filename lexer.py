@@ -53,18 +53,18 @@ class lexer:
             case "-":
                 token = Token(tokenKind=Token.MINUS)
                 self.nextChar()
-            case "\\":
-                if self.getNextChar() == "n":   
-                    token = Token(tokenKind=Token.NEWLINE)
-                    
-                elif self.getNextChar() == "0": token = Token(tokenKind=Token.EOF)
-                else:                           raise Exception("Wrong syntax!")
+            case "\n":
+                token = Token(tokenKind=Token.NEWLINE)
+                self.nextChar()
+            case "\0": 
+                token = Token(tokenKind=Token.EOF)  # no need go to next line
             case "\"":
                 self.nextChar()
                 startIdx = self.currIdx
                 while self.currChar != "\"":
                     self.nextChar()
                 token = Token(self.source[startIdx : self.currIdx], Token.STRING)
+                self.nextChar()
             case _ if re.match(r'[A-Za-z]', self.currChar):
                 startIdx = self.currIdx
                 while self.currChar.isalpha() is True:
@@ -77,13 +77,14 @@ class lexer:
                     case Token.SQRT.__name__: token = Token(self.source[startIdx:self.currIdx], Token.SQRT)
                     case Token.THEN.__name__: token = Token(self.source[startIdx:self.currIdx], Token.THEN)
                     case _:                   token = Token(self.source[startIdx : self.currIdx], Token.IDENT)
+                self.nextChar()
             case _ if self.currChar.isnumeric() is True:
                 startIdx = self.currIdx
                 while self.currChar.isnumeric() is True or (self.currChar == "." and self.getNextChar().isnumeric() is True):
                     self.nextChar()
                 token = Token(self.source[startIdx:self.currIdx], Token.NUMBER)
+                self.nextChar()
 
-        self.nextChar()
 
             
 
