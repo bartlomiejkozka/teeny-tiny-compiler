@@ -14,10 +14,11 @@ class Token(Enum):
     STRING = 3
     # Keywords:
     GOTO = 101
-    END = 102
+    LET = 102
     IF = 103
     SQRT = 104
     THEN = 105
+    PRINT = 106
     # Operators:
     EQ = 201
     PLUS = 202

@@ -1,18 +1,25 @@
-This parser class is checking if the syntax is compliant with the pseudocode syntax.
+This parser class is checking if the syntax is compliant with code syntax.
 
 Class function:
     • __init__ --> set the current token and next token
-    • checkToken --> check if the current token maches
-    • matchToken --> try to match current token
+    • checkToken --> check if the current token maches to specific kind
+    • matchToken --> try to match current token (use checkToken), when dont --> Error
     • checkPeek --> check if next token maches
     • nextToken --> advance current token
     • someErrorFunction
+    • functions which names are appropriate to name of syntax structure
 
 Syntax structure:
-• program :=
-• statement :=
-• comparison :=
-• expression :=
-• term :=
-• unary :=
-• primary := 
+• program := {statement}
+• statement := "GOTO" number nl |
+               "IF" comparison "THEN" expression nl |
+               "LET" ident "=" expression nl |
+               "PRINT" (string | primary) nl
+
+• comparison := expression (("==" | "<" | "<=" | ">" | ">=" | "!=") expression)+
+• expression := term {("+" | "-") term}
+• term := unary {("*" | "/") unary}  
+• unary := ["+" | "-"] primary
+• primary := ident | number
+• nl := '\n'+
+

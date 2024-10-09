@@ -1,4 +1,5 @@
-from token import Token
+from myToken import Token
+import sys
 import re
 
 
@@ -72,10 +73,11 @@ class lexer:
                 temp = self.source[startIdx:self.currIdx]
                 match temp:
                     case Token.GOTO.__name__: token = Token(self.source[startIdx:self.currIdx], Token.GOTO)
-                    case Token.END.__name__:  token = Token(self.source[startIdx:self.currIdx], Token.END)
+                    case Token.LET.__name__:  token = Token(self.source[startIdx:self.currIdx], Token.LET)
                     case Token.IF.__name__:   token = Token(self.source[startIdx:self.currIdx], Token.IF)
                     case Token.SQRT.__name__: token = Token(self.source[startIdx:self.currIdx], Token.SQRT)
                     case Token.THEN.__name__: token = Token(self.source[startIdx:self.currIdx], Token.THEN)
+                    case Token.PRINT.__name__: token = Token(self.source[startIdx:self.currIdx], Token.PRINT)
                     case _:                   token = Token(self.source[startIdx : self.currIdx], Token.IDENT)
                 self.nextChar()
             case _ if self.currChar.isnumeric() is True:
@@ -84,7 +86,8 @@ class lexer:
                     self.nextChar()
                 token = Token(self.source[startIdx:self.currIdx], Token.NUMBER)
                 self.nextChar()
-
+        
+        return token
 
             
 
