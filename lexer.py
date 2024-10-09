@@ -7,7 +7,7 @@ class lexer:
     def __init__(self, source):
         self.source = source + '\n'
         self.currIdx = 0
-        self.currChar = ''
+        self.currChar = self.source[self.currIdx]
 
     def getToken(self):
         self.skipWhiteSpace()
@@ -72,12 +72,12 @@ class lexer:
                     self.nextChar()
                 temp = self.source[startIdx:self.currIdx]
                 match temp:
-                    case Token.GOTO.__name__: token = Token(self.source[startIdx:self.currIdx], Token.GOTO)
-                    case Token.LET.__name__:  token = Token(self.source[startIdx:self.currIdx], Token.LET)
-                    case Token.IF.__name__:   token = Token(self.source[startIdx:self.currIdx], Token.IF)
-                    case Token.SQRT.__name__: token = Token(self.source[startIdx:self.currIdx], Token.SQRT)
-                    case Token.THEN.__name__: token = Token(self.source[startIdx:self.currIdx], Token.THEN)
-                    case Token.PRINT.__name__: token = Token(self.source[startIdx:self.currIdx], Token.PRINT)
+                    case Token.GOTO.name: token = Token(self.source[startIdx:self.currIdx], Token.GOTO)
+                    case Token.LET.name:  token = Token(self.source[startIdx:self.currIdx], Token.LET)
+                    case Token.IF.name:   token = Token(self.source[startIdx:self.currIdx], Token.IF)
+                    case Token.SQRT.name: token = Token(self.source[startIdx:self.currIdx], Token.SQRT)
+                    case Token.THEN.name: token = Token(self.source[startIdx:self.currIdx], Token.THEN)
+                    case Token.PRINT.name: token = Token(self.source[startIdx:self.currIdx], Token.PRINT)
                     case _:                   token = Token(self.source[startIdx : self.currIdx], Token.IDENT)
                 self.nextChar()
             case _ if self.currChar.isnumeric() is True:
