@@ -1,11 +1,11 @@
-from myToken import Token
+from myToken import *
 import sys
 import re
 
 
 class lexer:
     def __init__(self, source):
-        self.source = source + '\n'
+        self.source = source + '\0'
         self.currIdx = 0
         self.currChar = self.source[self.currIdx]
 
@@ -17,54 +17,54 @@ class lexer:
         match self.currChar:
             case "=":
                 if self.getNextChar() == "=": 
-                    token = Token(tokenKind=Token.EQEQ)
+                    token = Token(tokenKind=TokenType.EQEQ)
                     self.next2Char()
                 else:                         
-                    token =  Token(tokenKind=Token.EQ)
+                    token =  Token(tokenKind=TokenType.EQ)
                     self.nextChar()
             case ">":
                 if self.getNextChar() == "=": 
-                    token = Token(tokenKind=Token.GTEQ)
+                    token = Token(tokenKind=TokenType.GTEQ)
                     self.next2Char()
                 else:                         
-                    token = Token(tokenKind=Token.GT)
+                    token = Token(tokenKind=TokenType.GT)
                     self.nextChar()
             case "<":
                 if self.getNextChar() == "=": 
-                    token = Token(tokenKind=Token.LTEQ)
+                    token = Token(tokenKind=TokenType.LTEQ)
                     self.next2Char()
                 else:                         
-                    token = Token(tokenKind=Token.LT)
+                    token = Token(tokenKind=TokenType.LT)
                     self.nextChar()
             case "!":
                 if self.getNextChar() == "=": 
-                    token = Token(tokenKind=Token.NOTEQ)
+                    token = Token(tokenKind=TokenType.NOTEQ)
                     self.next2Char()
                 else:                         
                     raise Exception("Wrong syntax!")            #temporary resolution !!!
             case "*":
-                token = Token(tokenKind=Token.ASTERISK)
+                token = Token(tokenKind=TokenType.ASTERISK)
                 self.nextChar()
             case "/":
-                token = Token(tokenKind=Token.SLASH)
+                token = Token(tokenKind=TokenType.SLASH)
                 self.nextChar()
             case "+":
-                token = Token(tokenKind=Token.PLUS)
+                token = Token(tokenKind=TokenType.PLUS)
                 self.nextChar()
             case "-":
-                token = Token(tokenKind=Token.MINUS)
+                token = Token(tokenKind=TokenType.MINUS)
                 self.nextChar()
             case "\n":
-                token = Token(tokenKind=Token.NEWLINE)
+                token = Token(tokenKind=TokenType.NEWLINE)
                 self.nextChar()
             case "\0": 
-                token = Token(tokenKind=Token.EOF)  # no need go to next line
+                token = Token(tokenKind=TokenType.EOF)  # no need go to next line
             case "\"":
                 self.nextChar()
                 startIdx = self.currIdx
                 while self.currChar != "\"":
                     self.nextChar()
-                token = Token(self.source[startIdx : self.currIdx], Token.STRING)
+                token = Token(self.source[startIdx : self.currIdx], TokenType.STRING)
                 self.nextChar()
             case _ if re.match(r'[A-Za-z]', self.currChar):
                 startIdx = self.currIdx
@@ -72,20 +72,20 @@ class lexer:
                     self.nextChar()
                 temp = self.source[startIdx:self.currIdx]
                 match temp:
-                    case Token.GOTO.name: token = Token(self.source[startIdx:self.currIdx], Token.GOTO)
-                    case Token.LET.name:  token = Token(self.source[startIdx:self.currIdx], Token.LET)
-                    case Token.IF.name:   token = Token(self.source[startIdx:self.currIdx], Token.IF)
-                    case Token.SQRT.name: token = Token(self.source[startIdx:self.currIdx], Token.SQRT)
-                    case Token.THEN.name: token = Token(self.source[startIdx:self.currIdx], Token.THEN)
-                    case Token.PRINT.name: token = Token(self.source[startIdx:self.currIdx], Token.PRINT)
-                    case _:                   token = Token(self.source[startIdx : self.currIdx], Token.IDENT)
-                self.nextChar()
+                    case TokenType.GOTO.name: token = Token(self.source[startIdx:self.currIdx], TokenType.GOTO)
+                    case TokenType.LET.name:  token = Token(self.source[startIdx:self.currIdx], TokenType.LET)
+                    case TokenType.IF.name:   token = Token(self.source[startIdx:self.currIdx], TokenType.IF)
+                    case TokenType.SQRT.name: token = Token(self.source[startIdx:self.currIdx], TokenType.SQRT)
+                    case TokenType.THEN.name: token = Token(self.source[startIdx:self.currIdx], TokenType.THEN)
+                    case TokenType.PRINT.name: token = Token(self.source[startIdx:self.currIdx], TokenType.PRINT)
+                    case _:                   token = Token(self.source[startIdx : self.currIdx], TokenType.IDENT)
+                #self.nextChar()
             case _ if self.currChar.isnumeric() is True:
                 startIdx = self.currIdx
                 while self.currChar.isnumeric() is True or (self.currChar == "." and self.getNextChar().isnumeric() is True):
                     self.nextChar()
-                token = Token(self.source[startIdx:self.currIdx], Token.NUMBER)
-                self.nextChar()
+                token = Token(self.source[startIdx:self.currIdx], TokenType.NUMBER)
+                #self.nextChar()
         
         return token
 
@@ -104,7 +104,7 @@ class lexer:
 
     def skipWhiteSpace(self):
         while self.currChar == ' ' or self.currChar == '\t':
-            self.nextChar
+            self.nextChar()
 
     def skipComment(self):
         if self.currChar == '#' or self.currChar == '//':

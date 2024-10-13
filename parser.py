@@ -15,7 +15,7 @@ class parser:
 
 
     def checkToken(self, kind):
-        return self.currToken.kind == kind
+        return self.currToken.tokenKind == kind
     
 
     # def checkPeek(self, kind):
@@ -23,7 +23,7 @@ class parser:
     
 
     def abort(self):
-        sys.exit("Wrong syntax: \n" + "current Token: " + self.currToken + "\n" + "next Token: " + self.peekToken)
+        sys.exit("Wrong syntax: \n" + "current Token: " + str(self.currToken) + "\n" + "next Token: " + str(self.peekToken))
 
 
     def matchToken(self, kind):
@@ -34,30 +34,33 @@ class parser:
     
     def program(self):
         print("PROGRAM")
-        while not self.checkToken(Token.EOF):
+        while not self.checkToken(TokenType.EOF):
             self.statement()
     
     def statement(self):
-        if self.checkToken(Token.GOTO):
+        if self.checkToken(TokenType.GOTO):
             print("STATEMENT-GOTO")
             self.nextToken()
-            self.matchToken(Token.NUMBER)
-        elif self.checkToken(Token.IF):
+            self.matchToken(TokenType.NUMBER)
+        elif self.checkToken(TokenType.IF):
             print("STATEMENT-IF")
             self.nextToken()
             self.comparison()
-            self.matchToken(Token.THEN)
+            self.matchToken(TokenType.THEN)
             self.expression()
-        elif self.checkToken(Token.LET):
+        elif self.checkToken(TokenType.LET):
             print("STATEMENT-LET")
             self.nextToken()
-            self.matchToken(Token.IDENT)
-            self.matchToken(Token.EQ)
+            self.matchToken(TokenType.IDENT)
+            self.matchToken(TokenType.EQ)
             self.expression()
-        elif self.checkToken(Token.PRINT):
+        elif self.checkToken(TokenType.PRINT):
+            print("STATEMENT-PRINT")
             self.nextToken()
-            if self.checkToken(Token.STRING): self.nextToken()
+            if self.checkToken(TokenType.STRING): self.nextToken()
             else: self.primary()
+        elif self.checkToken(TokenType.EOF):
+            pass
         
         self.nl()
 
@@ -66,11 +69,11 @@ class parser:
         print("COMPARISON")
         self.nextToken()
         self.expression()
-        if any(self.checkToken(Token.EQEQ), self.checkToken(Token.NOTEQ), self.checkToken(Token.LT), self.checkToken(Token.LTEQ), self.checkToken(Token.GT), self.checkToken(Token.GTEQ)):
+        if any([self.checkToken(TokenType.EQEQ), self.checkToken(TokenType.NOTEQ), self.checkToken(TokenType.LT), self.checkToken(TokenType.LTEQ), self.checkToken(TokenType.GT), self.checkToken(TokenType.GTEQ)]):
             self.nextToken()
         else: self.abort()
         self.expression()
-        while any(self.checkToken(Token.EQEQ), self.checkToken(Token.NOTEQ), self.checkToken(Token.LT), self.checkToken(Token.LTEQ), self.checkToken(Token.GT), self.checkToken(Token.GTEQ)):
+        while any([self.checkToken(TokenType.EQEQ), self.checkToken(TokenType.NOTEQ), self.checkToken(TokenType.LT), self.checkToken(TokenType.LTEQ), self.checkToken(TokenType.GT), self.checkToken(TokenType.GTEQ)]):
             self.nextToken()
             self.expression()
 
@@ -78,7 +81,7 @@ class parser:
     def expression(self):
         print("EXPRESSION")
         self.term()
-        while any(self.checkToken(Token.PLUS), self.checkToken(Token.MINUS)):
+        while any([self.checkToken(TokenType.PLUS), self.checkToken(TokenType.MINUS)]):
             self.nextToken()
             self.term()
 
@@ -86,25 +89,26 @@ class parser:
     def term(self):
         print("TERM")
         self.unary()
-        while any(self.checkToken(Token.ASTERISK), self.checkToken(Token.SLASH)):
+        while any([self.checkToken(TokenType.ASTERISK), self.checkToken(TokenType.SLASH)]):
             self.nextToken()
             self.unary()
 
     
     def unary(self):
         print("UNARY")
-        if self.checkToken(Token.PLUS) or self.checkToken(Token.MINUS):
+        if self.checkToken(TokenType.PLUS) or self.checkToken(TokenType.MINUS):
             self.nextToken()
         self.primary()
 
     
     def primary(self):
         print("PRIMARY")
-        if self.checkToken(Token.NUMBER) or self.checkToken(Token.IDENT):
+        if self.checkToken(TokenType.NUMBER) or self.checkToken(TokenType.IDENT):
             self.nextToken()
         else: self.abort()
 
     def nl(self):
+        if self.checkToken(TokenType.EOF): return
         print("NEWLINE")
-        self.matchToken(Token.NEWLINE)
+        self.matchToken(TokenType.NEWLINE)
     

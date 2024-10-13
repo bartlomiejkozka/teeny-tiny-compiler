@@ -1,11 +1,6 @@
 from enum import Enum
 
-class Token(Enum):
-
-    def __init__(self, tokenText=None, tokenKind=None):
-        self.tokenText = tokenText
-        self.tokenKind = tokenKind
-
+class TokenType(Enum):
     # General token:
     EOF = -1
     NEWLINE = 0
@@ -32,3 +27,11 @@ class Token(Enum):
     GT = 210
     GTEQ = 211
 
+class Token:
+    def __init__(self, tokenText=None, tokenKind=None):
+        self.tokenText = tokenText
+        self.tokenKind = tokenKind
+    
+    def __repr__(self):
+        return f"Token(value={self.tokenText}, type={self.tokenKind})"
+    
