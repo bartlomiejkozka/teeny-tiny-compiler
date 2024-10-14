@@ -1,9 +1,14 @@
 from lexer import *
 from parser import *  
-
+import sys
 
 def main():
-    source = "LET a = 5\nLET b = 10\nPRINT a"
+    print("Tiny compiler")
+    if len(sys.argv) != 2:
+        sys.exit("Compiler needs source file as argument!")
+    with open(sys.argv[1], "r") as inputFile:
+        source = inputFile.read()
+    
     l = lexer(source)
     p = parser(l)
     p.program()

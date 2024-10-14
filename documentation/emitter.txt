@@ -1,0 +1,11 @@
+Emitter class will be translate the pseudocode to c code in order to compile the code with gcc (or clang) compiler.
+
+class artibuts:
+    • fullPath --> path to the output file, where will be c code
+    • code     --> c code container
+    • header   --> c headers (includes, main function, varaible defines)
+
+class methods:
+    • emit       --> add code to "code" varaible
+    • emitLine   --> add code with new line
+    • headerLine --> add code to header with new line

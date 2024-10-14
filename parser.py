@@ -1,13 +1,19 @@
 from lexer import *
+from emitter import *
 
 class parser:
-    def __init__(self, lexer):
+    def __init__(self, lexer, emitter):
         self.lexer = lexer
+        self.emitter = emitter
+
         self.currToken = None
         self.peekToken = None
         self.nextToken()
         self.nextToken()
     
+        self.VarDef = {}
+
+
 
     def nextToken(self):
         self.currToken = self.peekToken
@@ -34,6 +40,9 @@ class parser:
     
     def program(self):
         print("PROGRAM")
+        self.emitter.headerLine("#include <stdio.h>")
+        self.emitter.headerLine("#include <stdlib.h>")
+        self.emitter.headerLine("int main() {")
         while not self.checkToken(TokenType.EOF):
             self.statement()
     
@@ -44,9 +53,12 @@ class parser:
             self.matchToken(TokenType.NUMBER)
         elif self.checkToken(TokenType.IF):
             print("STATEMENT-IF")
+            self.emitter.emit("if(")
             self.nextToken()
             self.comparison()
             self.matchToken(TokenType.THEN)
+            self.emitter.emit(") {")
+            # there it could be another statment in the if stat.
             self.expression()
         elif self.checkToken(TokenType.LET):
             print("STATEMENT-LET")
@@ -67,13 +79,14 @@ class parser:
     
     def comparison(self):
         print("COMPARISON")
-        self.nextToken()
         self.expression()
         if any([self.checkToken(TokenType.EQEQ), self.checkToken(TokenType.NOTEQ), self.checkToken(TokenType.LT), self.checkToken(TokenType.LTEQ), self.checkToken(TokenType.GT), self.checkToken(TokenType.GTEQ)]):
+            self.emitter.emit(self.currToken.tokenText)
             self.nextToken()
         else: self.abort()
         self.expression()
         while any([self.checkToken(TokenType.EQEQ), self.checkToken(TokenType.NOTEQ), self.checkToken(TokenType.LT), self.checkToken(TokenType.LTEQ), self.checkToken(TokenType.GT), self.checkToken(TokenType.GTEQ)]):
+            self.emitter.emit(self.currToken.tokenText)
             self.nextToken()
             self.expression()
 
@@ -82,6 +95,7 @@ class parser:
         print("EXPRESSION")
         self.term()
         while any([self.checkToken(TokenType.PLUS), self.checkToken(TokenType.MINUS)]):
+            self.emitter.emit(self.currToken.tokenText)
             self.nextToken()
             self.term()
 
@@ -90,6 +104,7 @@ class parser:
         print("TERM")
         self.unary()
         while any([self.checkToken(TokenType.ASTERISK), self.checkToken(TokenType.SLASH)]):
+            self.emitter.emit(self.currToken.tokenText)
             self.nextToken()
             self.unary()
 
@@ -97,6 +112,7 @@ class parser:
     def unary(self):
         print("UNARY")
         if self.checkToken(TokenType.PLUS) or self.checkToken(TokenType.MINUS):
+            self.emitter.emit(self.currToken.tokenText)
             self.nextToken()
         self.primary()
 
@@ -104,6 +120,7 @@ class parser:
     def primary(self):
         print("PRIMARY")
         if self.checkToken(TokenType.NUMBER) or self.checkToken(TokenType.IDENT):
+            self.emitter.emit(self.currToken.tokenText)
             self.nextToken()
         else: self.abort()
 
