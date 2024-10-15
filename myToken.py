@@ -11,21 +11,21 @@ class TokenType(Enum):
     GOTO = 101
     LET = 102
     IF = 103
-    SQRT = 104
-    THEN = 105
-    PRINT = 106
+    THEN = 104
+    PRINT = 105
     # Operators:
     EQ = 201
     PLUS = 202
     MINUS = 203
     ASTERISK = 204
     SLASH = 205
-    EQEQ = 206
-    NOTEQ = 207
-    LT = 208
-    LTEQ = 209
-    GT = 210
-    GTEQ = 211
+    SQRT = 206
+    EQEQ = 207
+    NOTEQ = 208
+    LT = 209
+    LTEQ = 210
+    GT = 211
+    GTEQ = 212
 
 class Token:
     def __init__(self, tokenText=None, tokenKind=None):

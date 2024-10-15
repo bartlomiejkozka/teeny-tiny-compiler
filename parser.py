@@ -12,7 +12,21 @@ class parser:
         self.nextToken()
     
         self.VarDef = {}
+        self.currLineText = ''
 
+
+    def addToCurrLine(self, text):
+        self.currLineText += text
+
+
+    def addCurrLineToCode(self):
+        self.emitter.emitLine(self.currLineText)
+        self.currLineText = ''
+
+
+    def addCurrLineToHeader(self):
+        self.emitter.headerLine(self.currLineText)
+        self.currLineText = ''
 
 
     def nextToken(self):
@@ -24,8 +38,8 @@ class parser:
         return self.currToken.tokenKind == kind
     
 
-    # def checkPeek(self, kind):
-    #     return self.peekToken.kind == kind
+    def checkPeek(self, kind):
+        return self.peekToken.kind == kind
     
 
     def abort(self):
@@ -51,28 +65,35 @@ class parser:
             print("STATEMENT-GOTO")
             self.nextToken()
             self.matchToken(TokenType.NUMBER)
-        elif self.checkToken(TokenType.IF):
+
+        elif self.checkToken(TokenType.IF): # probably done
             print("STATEMENT-IF")
             self.emitter.emit("if(")
             self.nextToken()
             self.comparison()
             self.matchToken(TokenType.THEN)
             self.emitter.emit(") {")
-            # there it could be another statment in the if stat.
-            self.expression()
-        elif self.checkToken(TokenType.LET):
+            if any([self.checkToken(TokenType.GOTO), self.checkToken(TokenType.LET), self.checkToken(TokenType.PRINT)]):
+                self.statement()
+            else:
+                self.expression()
+
+        elif self.checkToken(TokenType.LET): # probably done
             print("STATEMENT-LET")
             self.nextToken()
+            self.newIdent = self.currToken.tokenText
             self.matchToken(TokenType.IDENT)
             self.matchToken(TokenType.EQ)
             self.expression()
-        elif self.checkToken(TokenType.PRINT):
+
+        elif self.checkToken(TokenType.PRINT):  
             print("STATEMENT-PRINT")
             self.nextToken()
             if self.checkToken(TokenType.STRING): self.nextToken()
             else: self.primary()
         elif self.checkToken(TokenType.EOF):
             pass
+        # add the elif for the operation on defined variables
         
         self.nl()
 
@@ -95,24 +116,40 @@ class parser:
         print("EXPRESSION")
         self.term()
         while any([self.checkToken(TokenType.PLUS), self.checkToken(TokenType.MINUS)]):
-            self.emitter.emit(self.currToken.tokenText)
+            #self.emitter.emit(self.currToken.tokenText)
+            self.addToCurrLine(self.currToken.tokenText)
             self.nextToken()
             self.term()
 
     
     def term(self):
         print("TERM")
-        self.unary()
+        self.semiUnary()
         while any([self.checkToken(TokenType.ASTERISK), self.checkToken(TokenType.SLASH)]):
-            self.emitter.emit(self.currToken.tokenText)
+            # self.emitter.emit(self.currToken.tokenText)
+            self.addToCurrLine(self.currToken.tokenText)
             self.nextToken()
+            self.semiUnary()
+
+
+    def semiUnary(self):
+        print("semiUnary (sqrt)")
+        if self.checkToken(TokenType.SQRT) and (self.checkPeek(TokenType.IDENT) or self.checkPeek(TokenType.NUMBER)):
+            self.addToCurrLine("sqrt(")
+            # self.emitter.emit("sqrt(")
+            self.nextToken()
+            self.primary()
+            self.addToCurrLine(")")
+            # self.emitter.emit(")")
+        else:
             self.unary()
 
     
     def unary(self):
         print("UNARY")
         if self.checkToken(TokenType.PLUS) or self.checkToken(TokenType.MINUS):
-            self.emitter.emit(self.currToken.tokenText)
+            self.addToCurrLine(self.currToken.tokenText)
+            # self.emitter.emit(self.currToken.tokenText)
             self.nextToken()
         self.primary()
 
@@ -120,7 +157,8 @@ class parser:
     def primary(self):
         print("PRIMARY")
         if self.checkToken(TokenType.NUMBER) or self.checkToken(TokenType.IDENT):
-            self.emitter.emit(self.currToken.tokenText)
+            self.addToCurrLine(self.currToken.tokenText)
+            # self.emitter.emit(self.currToken.tokenText)
             self.nextToken()
         else: self.abort()
 

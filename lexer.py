@@ -67,19 +67,24 @@ class lexer:
                 token = Token(self.source[startIdx : self.currIdx], TokenType.STRING)
                 self.nextChar()
             case _ if re.match(r'[A-Za-z]', self.currChar):
-                startIdx = self.currIdx
-                while self.currChar.isalpha() is True:
-                    self.nextChar()
-                temp = self.source[startIdx:self.currIdx]
-                match temp:
-                    case TokenType.GOTO.name: token = Token(self.source[startIdx:self.currIdx], TokenType.GOTO)
-                    case TokenType.LET.name:  token = Token(self.source[startIdx:self.currIdx], TokenType.LET)
-                    case TokenType.IF.name:   token = Token(self.source[startIdx:self.currIdx], TokenType.IF)
-                    case TokenType.SQRT.name: token = Token(self.source[startIdx:self.currIdx], TokenType.SQRT)
-                    case TokenType.THEN.name: token = Token(self.source[startIdx:self.currIdx], TokenType.THEN)
-                    case TokenType.PRINT.name: token = Token(self.source[startIdx:self.currIdx], TokenType.PRINT)
-                    case _:                   token = Token(self.source[startIdx : self.currIdx], TokenType.IDENT)
-                #self.nextChar()
+                # sqrt function
+                if self.currChar == 's' and self.getNextChar() == 'q' and self.source[self.currIdx + 2] == 'r' and self.source[self.currIdx + 3] == 't':
+                    token = Token(self.source[self.currIdx : self.currIdx + 4], TokenType.SQRT)
+                    for _ in range(4): self.nextChar()
+                else:
+                    startIdx = self.currIdx
+                    while self.currChar.isalpha() is True:
+                        self.nextChar()
+                    temp = self.source[startIdx:self.currIdx]
+                    match temp:
+                        case TokenType.GOTO.name: token = Token(self.source[startIdx:self.currIdx], TokenType.GOTO)
+                        case TokenType.LET.name:  token = Token(self.source[startIdx:self.currIdx], TokenType.LET)
+                        case TokenType.IF.name:   token = Token(self.source[startIdx:self.currIdx], TokenType.IF)
+                        case TokenType.SQRT.name: token = Token(self.source[startIdx:self.currIdx], TokenType.SQRT)
+                        case TokenType.THEN.name: token = Token(self.source[startIdx:self.currIdx], TokenType.THEN)
+                        case TokenType.PRINT.name: token = Token(self.source[startIdx:self.currIdx], TokenType.PRINT)
+                        case _:                   token = Token(self.source[startIdx : self.currIdx], TokenType.IDENT)
+                    #self.nextChar()
             case _ if self.currChar.isnumeric() is True:
                 startIdx = self.currIdx
                 while self.currChar.isnumeric() is True or (self.currChar == "." and self.getNextChar().isnumeric() is True):
