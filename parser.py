@@ -8,10 +8,13 @@ class parser:
 
         self.currToken = None
         self.peekToken = None
+        self.currLine = 1
         self.nextToken()
         self.nextToken()
     
-        self.VarDef = {}
+        self.defVar = []
+        self.gotoed = []
+
         self.currLineText = ''
 
 
@@ -57,45 +60,77 @@ class parser:
         self.emitter.headerLine("#include <stdio.h>")
         self.emitter.headerLine("#include <stdlib.h>")
         self.emitter.headerLine("int main() {")
+        self.currLine += 4 # 3 + 1 because 1 is varaible definition line
         while not self.checkToken(TokenType.EOF):
+            if self.currLine in self.gotoed:
+                self.emitter.emitLine("}")
             self.statement()
+            self.currLine += 1
+        self.emitter.headerLine("LET float " + ', '.join(self.defVar) + ";")
     
+
     def statement(self):
         if self.checkToken(TokenType.GOTO):
             print("STATEMENT-GOTO")
             self.nextToken()
+            tempNum = self.currToken.tokenText
             self.matchToken(TokenType.NUMBER)
+            self.gotoed += tempNum
 
         elif self.checkToken(TokenType.IF): # probably done
             print("STATEMENT-IF")
-            self.emitter.emit("if(")
             self.nextToken()
+            
+            # stupid method
+            tempLexObj = lexer(self.lexer.source)
+            tempLexObj.currIdx = self.lexer.currIdx
+            tempLexObj.currChar = self.lexer.currChar
+            isGoto = False
+            currToken = tempLexObj.getToken().tokenKind
+            while currToken != TokenType.NEWLINE:
+                if currToken == TokenType.GOTO:
+                    isGoto = True
+                    break
+                currToken = tempLexObj.getToken().tokenKind
+
+            if isGoto: self.emitter.emit("while(")
+            else: self.emitter.emit("if(")
             self.comparison()
             self.matchToken(TokenType.THEN)
-            self.emitter.emit(") {")
+            self.emitter.emitLine(") {")
             if any([self.checkToken(TokenType.GOTO), self.checkToken(TokenType.LET), self.checkToken(TokenType.PRINT)]):
                 self.statement()
             else:
                 self.expression()
+            self.emitter.emit(";}")
 
         elif self.checkToken(TokenType.LET): # probably done
             print("STATEMENT-LET")
             self.nextToken()
             self.newIdent = self.currToken.tokenText
             self.matchToken(TokenType.IDENT)
+            self.defVar += self.newIdent
+            self.emitter.emit(self.newIdent)
             self.matchToken(TokenType.EQ)
+            self.emitter.emit(" = ")
             self.expression()
+            self.emitter.emit(";")
 
-        elif self.checkToken(TokenType.PRINT):  
+        elif self.checkToken(TokenType.PRINT):  # probably done
             print("STATEMENT-PRINT")
             self.nextToken()
-            if self.checkToken(TokenType.STRING): self.nextToken()
-            else: self.primary()
+            if self.checkToken(TokenType.STRING): 
+                self.emitter.emit(f'printf("{self.currToken.tokenText}\\n");')
+                self.nextToken()
+            else:
+                self.emitter.emit("printf(\"%f\\n\", ") 
+                self.primary()
+                self.emitter.emit(");")
         elif self.checkToken(TokenType.EOF):
             pass
         # add the elif for the operation on defined variables
         
-        self.nl()
+        self.nl() # prints new line
 
     
     def comparison(self):
@@ -116,8 +151,7 @@ class parser:
         print("EXPRESSION")
         self.term()
         while any([self.checkToken(TokenType.PLUS), self.checkToken(TokenType.MINUS)]):
-            #self.emitter.emit(self.currToken.tokenText)
-            self.addToCurrLine(self.currToken.tokenText)
+            self.emitter.emit(self.currToken.tokenText)
             self.nextToken()
             self.term()
 
@@ -126,8 +160,7 @@ class parser:
         print("TERM")
         self.semiUnary()
         while any([self.checkToken(TokenType.ASTERISK), self.checkToken(TokenType.SLASH)]):
-            # self.emitter.emit(self.currToken.tokenText)
-            self.addToCurrLine(self.currToken.tokenText)
+            self.emitter.emit(self.currToken.tokenText)
             self.nextToken()
             self.semiUnary()
 
@@ -135,12 +168,10 @@ class parser:
     def semiUnary(self):
         print("semiUnary (sqrt)")
         if self.checkToken(TokenType.SQRT) and (self.checkPeek(TokenType.IDENT) or self.checkPeek(TokenType.NUMBER)):
-            self.addToCurrLine("sqrt(")
-            # self.emitter.emit("sqrt(")
+            self.emitter.emit("sqrt(")
             self.nextToken()
             self.primary()
-            self.addToCurrLine(")")
-            # self.emitter.emit(")")
+            self.emitter.emit(")")
         else:
             self.unary()
 
@@ -148,8 +179,7 @@ class parser:
     def unary(self):
         print("UNARY")
         if self.checkToken(TokenType.PLUS) or self.checkToken(TokenType.MINUS):
-            self.addToCurrLine(self.currToken.tokenText)
-            # self.emitter.emit(self.currToken.tokenText)
+            self.emitter.emit(self.currToken.tokenText)
             self.nextToken()
         self.primary()
 
@@ -157,13 +187,14 @@ class parser:
     def primary(self):
         print("PRIMARY")
         if self.checkToken(TokenType.NUMBER) or self.checkToken(TokenType.IDENT):
-            self.addToCurrLine(self.currToken.tokenText)
-            # self.emitter.emit(self.currToken.tokenText)
+            self.emitter.emit(self.currToken.tokenText)
             self.nextToken()
         else: self.abort()
+
 
     def nl(self):
         if self.checkToken(TokenType.EOF): return
         print("NEWLINE")
         self.matchToken(TokenType.NEWLINE)
+        self.emitter.emitLine('')
     
