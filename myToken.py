@@ -13,6 +13,7 @@ class TokenType(Enum):
     IF = 103
     THEN = 104
     PRINT = 105
+    END = 106
     # Operators:
     EQ = 201
     PLUS = 202

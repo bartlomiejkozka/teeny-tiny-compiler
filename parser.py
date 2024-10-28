@@ -49,6 +49,10 @@ class parser:
         sys.exit("Wrong syntax: \n" + "current Token: " + str(self.currToken) + "\n" + "next Token: " + str(self.peekToken))
 
 
+    def abortVar(self):
+        sys.exit("not defined variable: " + str(self.currToken))
+
+
     def matchToken(self, kind):
         if not self.checkToken(kind):
             self.abort()
@@ -62,7 +66,7 @@ class parser:
         self.emitter.headerLine("int main() {")
         self.currLine += 4 # 3 + 1 because 1 is varaible definition line
         while not self.checkToken(TokenType.EOF):
-            if self.currLine in self.gotoed:
+            if (self.currLine + 1) in self.gotoed:  # the while logic
                 self.emitter.emitLine("}")
             self.statement()
             self.currLine += 1
@@ -70,7 +74,7 @@ class parser:
     
 
     def statement(self):
-        if self.checkToken(TokenType.GOTO):
+        if self.checkToken(TokenType.GOTO):  # probably done
             print("STATEMENT-GOTO")
             self.nextToken()
             tempNum = self.currToken.tokenText
@@ -102,7 +106,8 @@ class parser:
                 self.statement()
             else:
                 self.expression()
-            self.emitter.emit(";}")
+            if not isGoto: self.emitter.emit(";}")
+            
 
         elif self.checkToken(TokenType.LET): # probably done
             print("STATEMENT-LET")
@@ -126,10 +131,25 @@ class parser:
                 self.emitter.emit("printf(\"%f\\n\", ") 
                 self.primary()
                 self.emitter.emit(");")
-        elif self.checkToken(TokenType.EOF):
-            pass
-        # add the elif for the operation on defined variables
-        
+
+        elif self.checkToken(TokenType.IDENT):  # probably done 
+            print("STATEMENT-OPERATION")
+            if(self.currToken.tokenText in self.defVar):
+                self.emitter.emit(self.currToken.tokenText)
+                self.nextToken()
+                self.matchToken(TokenType.EQ)
+                self.emitter.emit(" = ")
+                self.expression()
+                self.emitter.emit(";")
+            else: 
+                self.abortVar()
+
+        elif self.checkToken(TokenType.END):    # probably done
+            print("STATEMENT-END")
+            self.emitter.emitLine(" return 0;")
+            self.emitter.emit("}")
+            self.nextToken()
+
         self.nl() # prints new line
 
     

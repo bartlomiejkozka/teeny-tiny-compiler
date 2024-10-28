@@ -77,13 +77,14 @@ class lexer:
                         self.nextChar()
                     temp = self.source[startIdx:self.currIdx]
                     match temp:
-                        case TokenType.GOTO.name: token = Token(self.source[startIdx:self.currIdx], TokenType.GOTO)
-                        case TokenType.LET.name:  token = Token(self.source[startIdx:self.currIdx], TokenType.LET)
-                        case TokenType.IF.name:   token = Token(self.source[startIdx:self.currIdx], TokenType.IF)
-                        case TokenType.SQRT.name: token = Token(self.source[startIdx:self.currIdx], TokenType.SQRT)
-                        case TokenType.THEN.name: token = Token(self.source[startIdx:self.currIdx], TokenType.THEN)
+                        case TokenType.GOTO.name:  token = Token(self.source[startIdx:self.currIdx], TokenType.GOTO)
+                        case TokenType.LET.name:   token = Token(self.source[startIdx:self.currIdx], TokenType.LET)
+                        case TokenType.IF.name:    token = Token(self.source[startIdx:self.currIdx], TokenType.IF)
+                        case TokenType.SQRT.name:  token = Token(self.source[startIdx:self.currIdx], TokenType.SQRT)
+                        case TokenType.THEN.name:  token = Token(self.source[startIdx:self.currIdx], TokenType.THEN)
                         case TokenType.PRINT.name: token = Token(self.source[startIdx:self.currIdx], TokenType.PRINT)
-                        case _:                   token = Token(self.source[startIdx : self.currIdx], TokenType.IDENT)
+                        case TokenType.END.name:   token = Token(self.source[startIdx:self.currIdx], TokenType.END)
+                        case _:                    token = Token(self.source[startIdx : self.currIdx], TokenType.IDENT)
                     #self.nextChar()
             case _ if self.currChar.isnumeric() is True:
                 startIdx = self.currIdx
