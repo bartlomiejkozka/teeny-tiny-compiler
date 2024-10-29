@@ -1,0 +1,10 @@
+LET x = 4
+LET y = 3
+LET wynik = 0
+LET reszta = x
+IF reszta < y THEN GOTO 9
+reszta = reszta - y
+wynik = wynik + 1
+GOTO 5
+PRINT wynik
+END

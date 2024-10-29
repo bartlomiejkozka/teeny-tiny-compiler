@@ -17,42 +17,42 @@ class lexer:
         match self.currChar:
             case "=":
                 if self.getNextChar() == "=": 
-                    token = Token(tokenKind=TokenType.EQEQ)
+                    token = Token("==", TokenType.EQEQ)
                     self.next2Char()
                 else:                         
-                    token =  Token(tokenKind=TokenType.EQ)
+                    token =  Token("=", TokenType.EQ)
                     self.nextChar()
             case ">":
                 if self.getNextChar() == "=": 
-                    token = Token(tokenKind=TokenType.GTEQ)
+                    token = Token(">=", TokenType.GTEQ)
                     self.next2Char()
                 else:                         
-                    token = Token(tokenKind=TokenType.GT)
+                    token = Token(">", TokenType.GT)
                     self.nextChar()
             case "<":
                 if self.getNextChar() == "=": 
-                    token = Token(tokenKind=TokenType.LTEQ)
+                    token = Token("<=", TokenType.LTEQ)
                     self.next2Char()
                 else:                         
-                    token = Token(tokenKind=TokenType.LT)
+                    token = Token("<", TokenType.LT)
                     self.nextChar()
             case "!":
                 if self.getNextChar() == "=": 
-                    token = Token(tokenKind=TokenType.NOTEQ)
+                    token = Token("!=", TokenType.NOTEQ)
                     self.next2Char()
                 else:                         
                     raise Exception("Wrong syntax!")            #temporary resolution !!!
             case "*":
-                token = Token(tokenKind=TokenType.ASTERISK)
+                token = Token("*", TokenType.ASTERISK)
                 self.nextChar()
             case "/":
-                token = Token(tokenKind=TokenType.SLASH)
+                token = Token("/", TokenType.SLASH)
                 self.nextChar()
             case "+":
-                token = Token(tokenKind=TokenType.PLUS)
+                token = Token("+", TokenType.PLUS)
                 self.nextChar()
             case "-":
-                token = Token(tokenKind=TokenType.MINUS)
+                token = Token("-", TokenType.MINUS)
                 self.nextChar()
             case "\n":
                 token = Token(tokenKind=TokenType.NEWLINE)

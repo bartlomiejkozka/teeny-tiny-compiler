@@ -15,6 +15,7 @@ class parser:
         self.defVar = []
         self.gotoed = []
 
+        self.alreadyNewLine = False
         self.currLineText = ''
 
 
@@ -66,11 +67,11 @@ class parser:
         self.emitter.headerLine("int main() {")
         self.currLine += 4 # 3 + 1 because 1 is varaible definition line
         while not self.checkToken(TokenType.EOF):
-            if (self.currLine + 1) in self.gotoed:  # the while logic
+            if str(self.currLine - 4) in self.gotoed:  # the while logic
                 self.emitter.emitLine("}")
             self.statement()
             self.currLine += 1
-        self.emitter.headerLine("LET float " + ', '.join(self.defVar) + ";")
+        self.emitter.headerLine("float " + ', '.join(self.defVar) + ";")
     
 
     def statement(self):
@@ -104,9 +105,10 @@ class parser:
             self.emitter.emitLine(") {")
             if any([self.checkToken(TokenType.GOTO), self.checkToken(TokenType.LET), self.checkToken(TokenType.PRINT)]):
                 self.statement()
+                self.alreadyNewLine = True
             else:
                 self.expression()
-            if not isGoto: self.emitter.emit(";}")
+            if not isGoto: self.emitter.emitLine("}")
             
 
         elif self.checkToken(TokenType.LET): # probably done
@@ -114,7 +116,7 @@ class parser:
             self.nextToken()
             self.newIdent = self.currToken.tokenText
             self.matchToken(TokenType.IDENT)
-            self.defVar += self.newIdent
+            self.defVar.append(self.newIdent)
             self.emitter.emit(self.newIdent)
             self.matchToken(TokenType.EQ)
             self.emitter.emit(" = ")
@@ -125,7 +127,7 @@ class parser:
             print("STATEMENT-PRINT")
             self.nextToken()
             if self.checkToken(TokenType.STRING): 
-                self.emitter.emit(f'printf("{self.currToken.tokenText}\\n");')
+                self.emitter.emit(f'printf("%s\\n", "{self.currToken.tokenText}");')
                 self.nextToken()
             else:
                 self.emitter.emit("printf(\"%f\\n\", ") 
@@ -150,7 +152,10 @@ class parser:
             self.emitter.emit("}")
             self.nextToken()
 
-        self.nl() # prints new line
+        if not self.alreadyNewLine:
+            self.nl() # prints new line
+        else:
+            self.alreadyNewLine = False
 
     
     def comparison(self):
@@ -213,7 +218,7 @@ class parser:
 
 
     def nl(self):
-        if self.checkToken(TokenType.EOF): return
+        if self.checkToken(TokenType.EOF) or self.checkToken(TokenType.END): return
         print("NEWLINE")
         self.matchToken(TokenType.NEWLINE)
         self.emitter.emitLine('')
