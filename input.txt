@@ -1,9 +1,0 @@
-LET a = 2
-LET b = 3
-LET c = a * b
-PRINT c
-PRINT "Hello World"
-IF a < b THEN PRINT "Yes"
-END
-
-
