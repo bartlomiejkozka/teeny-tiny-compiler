@@ -52,3 +52,6 @@ This project includes a backend API server (using FastAPI) and a frontend applic
    ```bash
    python main.py
 
+## Using a Virtual Environment (Optional)
+    Visit the website if you are interested in:
+    https://realpython.com/python-virtual-environments-a-primer/
