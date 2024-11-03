@@ -12,9 +12,9 @@
     <h1>Tiny Compiler</h1>
     
     <form class="code-form">
-      <label for="pseudocode-input">Enter your code:</label>
-      <textarea id="pseudocode-input" placeholder="Write your code here..."></textarea>
-      <button type="submit">Run Code</button>
+      <label for="CodeInput">Enter your code:</label>
+      <textarea id="codeInput" placeholder="Write your code here..."></textarea>
+      <button id="runButton" type="submit">Run Code</button>
     </form>
 
     <div class="output-container">
@@ -25,5 +25,31 @@
     </div>
   </div>
 
+  <script>
+    document.getElementById("runButton").addEventListener("click", async function () {
+        event.preventDefault(); // Prevent the form from submitting`
+        const codeText = document.getElementById("codeInput").value;
+
+        try {
+            const response = await fetch("http://127.0.0.1:8000/run_code", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ code: codeText })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                document.getElementById("output-box").textContent = data.code;
+            } else {
+                const errorData = await response.json();
+                document.getElementById("output-box").textContent = `Error: ${errorData.detail}`;
+            }
+        } catch (error) {
+            document.getElementById("output-box").textContent = `Error: ${error.message}`;
+        }
+    });
+  </script>
 </body>
 </html>

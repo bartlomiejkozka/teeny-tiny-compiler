@@ -1,5 +1,5 @@
 class emitter:
-    def __init__(self, outputPath):
+    def __init__(self, outputPath=None):
         self.outputPath = outputPath
         self.code = ''
         self.header = ''
@@ -14,8 +14,11 @@ class emitter:
         self.header += code + '\n'
     
     def writeFile(self):
-        with open(self.outputPath, 'w') as file:
-            file.write(self.header + self.code)
+        with open(self.outputPath, 'w') as file:     
+            file.write(self.codeGetter())
+
+    def codeGetter(self):
+        return self.header + self.code
 
         
 

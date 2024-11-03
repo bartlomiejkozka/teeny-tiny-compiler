@@ -70,7 +70,8 @@ class parser:
                 self.emitter.emit("}")
             self.statement()
             self.currLine += 1
-        self.emitter.headerLine("float " + ', '.join(self.defVar) + ";")
+        if self.defVar != []:
+            self.emitter.headerLine("float " + ', '.join(self.defVar) + ";")
     
 
     def statement(self):
