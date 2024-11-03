@@ -51,7 +51,10 @@ This project includes a backend API server (using FastAPI) and a frontend applic
    Run the main script to start both the backend API server and the frontend application:
    ```bash
    python main.py
+   ```
 
 ## Using a Virtual Environment (Optional)
     Visit the website if you are interested in:
+    ```bash
     https://realpython.com/python-virtual-environments-a-primer/
+    ```
