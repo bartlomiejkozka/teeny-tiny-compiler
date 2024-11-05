@@ -8,32 +8,9 @@ from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from contextlib import asynccontextmanager
+import webbrowser
+import asyncio
 
-# def main():
-#     print("Tiny compiler:")
-#     if len(sys.argv) != 3:
-#         sys.exit("Compiler needs:\nargv[1]-> source file\nargv[2]-> output file\nas program arguments!")
-#     with open(sys.argv[1], "r") as inputFile:
-#         source = inputFile.read()
-    
-#     l = lexer(source)
-#     p = parser(l, emitter(sys.argv[2]))
-#     p.program()
-#     p.emitter.writeFile()
-#     print("Parsing completed successfully!")
-
-#     compile = subprocess.run(["gcc", sys.argv[2], "-o", "output"], capture_output=True, text=True)
-#     if compile.returncode != 0:
-#         sys.exit("Compilation failed!: " + compile.stderr)
-#     else: print("Compilation completed successfully!\n")
-
-#     run = subprocess.run(["./output"], capture_output=True, text=True)
-#     print("Program output:")
-#     print(run.stdout)
-
-#     if run.stderr:
-#         print("Runtime Errors:")
-#         print(run.stderr)
 
 def compileCcode(sourceFile):
     compile = subprocess.run(["gcc", sourceFile, "-o", "output"], capture_output=True, text=True)
@@ -65,8 +42,12 @@ app.add_middleware(
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     frontend_process = subprocess.Popen(
-        ["python3", "-m", "http.server", "8888", "--directory", "../frontend"]
+        ["python3", "-m", "http.server", "8888", "--directory", "../frontend/"]
     )
+    # Give the server a moment to start
+    await asyncio.sleep(1)
+    # Open the frontend in the web browser
+    webbrowser.open("http://localhost:8888")
     try:
         yield 
     finally:

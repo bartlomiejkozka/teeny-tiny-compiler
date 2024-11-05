@@ -50,7 +50,7 @@ This project includes a backend API server (using FastAPI) and a frontend applic
 1. **Start the Application**  
    Run the main script to start both the backend API server and the frontend application:
    ```bash
-   python main.py
+   python main.py`
    ```
 
 ## Using a Virtual Environment (Optional)
