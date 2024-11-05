@@ -6,3 +6,4 @@ venv/
 input.txt
 output.c
 output
+.DS_Store
