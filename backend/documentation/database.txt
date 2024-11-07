@@ -1,0 +1,13 @@
+Databse model:
+
+User table:
+    • user id pirmary key
+    • user name
+    • user login
+    • user password
+
+Script table:
+    • script id praimry key
+    • script pseudo code
+    • script c code
+    • user id foreign key
