@@ -19,6 +19,7 @@ class User(Base):
     password:   Mapped[str] = mapped_column(String(50))
 
     scripts: Mapped[List['Script']] = relationship(back_populates='user')
+    session_tokens: Mapped[List['SessionToken']] = relationship(back_populates='user')
 
     def __repr__(self):
         return f"User(id={self.id!r}, name={self.name!r}, login={self.login!r})"
@@ -40,7 +41,7 @@ class Script(Base):
 class SessionToken(Base):
     __tablename__ = 'session_tokens'
 
-    token:      Mapped[str] = mapped_column(String, primary_key=True)
+    token:      Mapped[str] = mapped_column(String(50), primary_key=True)
     user_id:    Mapped[int] = mapped_column(ForeignKey('users.id'))
 
     user: Mapped[User] = relationship(back_populates='session_tokens')

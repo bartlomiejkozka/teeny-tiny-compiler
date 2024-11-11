@@ -18,7 +18,9 @@ import uuid
 from fastapi.responses import JSONResponse
 from fastapi.requests import Request
 from fastapi.responses import RedirectResponse
-from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
+from datetime import datetime, timedelta
+
 
 
 def compileCcode(sourceFile):
@@ -37,7 +39,8 @@ def start_frontend():
 
 
 app = FastAPI()
-database = Database()        # CHANGE
+#app.mount("/static", StaticFiles(directory="../frontend", html=True), name="static")
+database = Database(user='bart', password='bart2115', host='127.0.0.1', port='3306', database='compilerApp')        # CHANGE
 database.create_tables()
 
 origins = [ "http://localhost:8888" ]
@@ -50,22 +53,35 @@ app.add_middleware(
     allow_headers=["*"] 
 )
 
+class Code(BaseModel):
+    code: str
+class CodeName(BaseModel):
+    name: str
+class UserLogin(BaseModel):
+    login: str
+    password: str
+class UserRegister(BaseModel):
+    name: str
+    login: str
+    password: str
+
+
 # Authentication user functions:
-def isUserYet(user: User, db: Session = Depends(database.get_session)):
+def isUserYet(user: UserRegister, db: Session):
     return db.query(User).filter(User.login == user.login).first()
 
-def isLoginPasswordCorrect(user: User, db: Session = Depends(database.get_session)):
+def isLoginPasswordCorrect(user: UserLogin, db: Session):
     return db.query(User).filter(User.login == user.login).filter(User.password == user.password).first()
 
 def get_current_user(request: Request):
     session_token = request.cookies.get("session_token")
     if session_token is None:
-        raise HTTPException(status_code=401, detail="Not authenticated")
+        return {"user_id": None}    # when user is not logged in
     
     session = database.get_session()
     user_id = session.query(SessionToken).filter(SessionToken.token == session_token).first().user_id
     if user_id is None:
-        raise HTTPException(status_code=401, detail="Not authenticated01")
+        raise HTTPException(status_code=400, detail="Not authenticated")
     
     return {"user_id": user_id}
 
@@ -86,46 +102,43 @@ async def lifespan(app: FastAPI):
 app.router.lifespan_context = lifespan
 
 
-class Code(BaseModel):
-    code: str
-class CodeName(BaseModel):
-    name: str
-class User(BaseModel):
-    name: str
-    login: str
-    password: str
 
 
 @app.post("/signup")
-def register(user: User, db: Session = Depends(database.get_session)):
-    if isUserYet(user) is not None:
-        raise HTTPException(status_code=400, detail="User already exists!")
+def register(user: UserRegister, db: Session = Depends(database.get_session)):
+    if isUserYet(user, db) is not None:
+        return {'message': None}
     db.add(User(name=user.name, login=user.login, password=user.password))
     db.commit()
-    return {"user": "User registered successfully!"}
+    return {'message': 'User registered successfully!'}
 
 
 @app.post("/signin")
-def login(user: User, db: Session = Depends(database.get_session)):
-    if isLoginPasswordCorrect(user) is None:
+def login(user: UserLogin, db: Session = Depends(database.get_session)):
+    if isLoginPasswordCorrect(user, db) is None:
         raise HTTPException(status_code=400, detail="Incorrect login or password!")
     
     session_token = str(uuid.uuid4())
-    db.add(SessionToken(token=session_token, user_id=user.id))
+    user1 = db.query(User).filter(User.login == user.login).filter(User.password == user.password).first()
+    db.add(SessionToken(token=session_token, user_id=user1.id))
     db.commit()
-    #response = JSONResponse(content={"message": "Logged in successfully!"})
-    response = RedirectResponse(url="/")
-    response.set_cookie(key="session_token", value=session_token, httponly=True)
+
+    response = JSONResponse(content={"redirect_url": "/index.html"})
+    response.set_cookie(key="session_token", value=session_token, httponly=True, path="/")        # Expiration time in HTTP-date format)
+    response.headers["Cache-Control"] = "no-cache, no-store, max-age=0, must-revalidate"
+
     return response
 
 
-@app.get("/")
-def read_root(request: Request, user: dict = Depends(get_current_user)):
-    #return templates.TemplateResponse("home.html", {"request": request})
+# while getting in index.html, check if session_token is present in cookies
+@app.get("/auto_authenticate")
+def read_root(user: dict = Depends(get_current_user), db: Session = Depends(database.get_session)):
+    if user["user_id"] is None:
+        return {"user_name": None}
+    name = db.query(User).filter(User.id == user["user_id"]).first().name
+    return {"user_name": name}
     
     
-
-
 @app.post("/run_code")
 def run_code(source: Code):
     source_code = source.code

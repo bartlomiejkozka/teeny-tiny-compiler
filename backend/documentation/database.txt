@@ -5,7 +5,7 @@ User table:
     • user name
     • user login
     • user password
-
+`
 Script table:
     • script id praimry key
     • script pseudo code
