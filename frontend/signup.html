@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+</head>
+<body>
+
+    <h2>Sign Up</h2>
+    <form id="signupForm">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+        <br><br>
+        <label for="login">Login:</label>
+        <input type="login" id="login" name="login" required minlength="5" maxlength="15" pattern="[A-Za-z0-9]+" title="5-15 letters and numbers only">
+        <br><br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required minlength="5" maxlength="20" title="at least 5 characters max:20">
+        <br><br>
+        <button type="submit">Sign Up</button>
+    </form>
+    <p>Already have an account? <a href="signin.html">Log in here</a></p>
+
+    <script>
+        document.getElementById("signupForm").addEventListener("submit", async function(event) {
+            event.preventDefault();  // Prevent the form from submitting the default way
+
+            const name = document.getElementById("username").value;
+            const login = document.getElementById("login").value;
+            const password = document.getElementById("password").value;
+            const data = { name, login, password };
+
+            try {
+                const response = await fetch("http://127.0.0.1:8000/signup", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(data)
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.message != null) {
+                        console.log("Succesful signup: " + data.message);
+                        window.location.href = "/signin.html";
+                    } else {
+                        console.log('User already exists!');
+                    }
+                } else {
+                    const error = await response.json();
+                    alert("Signup failed: " + error.message);
+                }
+            } catch (error) {
+                alert("Error: " + error.message);
+            }
+        });
+    </script>
+</body>
+</html>

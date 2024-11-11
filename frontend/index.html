@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tiny Compiler</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="mini-menu">
+  <a id="userLink" href='signin.html'>Login</a>
+  <a href="saved_code.html">Saved Code</a>
+  </div>
+
+  <div class = "container0">
+    <div class="container">
+      <h1>Tiny Compiler</h1>
+      
+      <form class="code-form">
+        <label for="codeInput">Enter your code:</label>
+        <textarea id="codeInput" placeholder="Write your code here..."></textarea>
+        <button id="runButton" type="submit">Run Code</button>
+      </form>
+
+      <div class="output-container">
+        <p>Output</p>
+        <div class="output-box" id="output-box">
+          <!-- Output will appear here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function checkUserAuthentication() {
+      try {
+        const response = await fetch("http://127.0.0.1:8000/auto_authenticate", {
+          method: 'GET',
+          credentials: 'include', // Sends cookies with the request for session-based auth
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          const userLink = document.getElementById('userLink');
+
+          if (data.user_name != null) {
+            console.log(`User is authenticated as ${data.user_name}`);
+            userLink.textContent = data.user_name;
+            userLink.href = 'profile.html';
+          } else {
+            console.log('User is not authenticated');
+            userLink.textContent = 'Login';
+            userLink.href = 'signin.html';
+          }
+        } else {
+          console.error('Failed to verify authentication:', response.status);
+        }
+      } catch (error) {
+        console.error('Error checking authentication:', error);
+      }
+    }
+    window.addEventListener('load', checkUserAuthentication);
+
+
+
+    document.getElementById("runButton").addEventListener("click", async function () {
+        event.preventDefault(); // Prevent the form from submitting`
+        const codeText = document.getElementById("codeInput").value;
+
+        try {
+            const response = await fetch("http://127.0.0.1:8000/run_code", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ code: codeText })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                document.getElementById("output-box").textContent = data.code;
+            } else {
+                const errorData = await response.json();
+                document.getElementById("output-box").textContent = `Error: ${errorData.detail}`;
+            }
+        } catch (error) {
+            document.getElementById("output-box").textContent = `Error: ${error.message}`;
+        }
+    });
+  </script>
+</body>
+</html>
