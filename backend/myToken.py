@@ -33,6 +33,13 @@ class Token:
         self.tokenText = tokenText
         self.tokenKind = tokenKind
     
+
+    def __eq__(self, other):
+        if isinstance(other, Token):
+            return self.tokenText == other.tokenText and self.tokenKind == other.tokenKind
+        return False
+
+
     def __repr__(self):
         return f"Token(value={self.tokenText}, type={self.tokenKind})"
     

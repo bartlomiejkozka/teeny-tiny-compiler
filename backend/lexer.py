@@ -1,4 +1,4 @@
-from myToken import *
+from backend.myToken import *
 import sys
 import re
 

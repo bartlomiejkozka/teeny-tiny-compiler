@@ -1,6 +1,6 @@
-from lexer import *
-from parser import *  
-from database import *
+from backend.lexer import *
+from backend.parser import *  
+from backend.database import *
 
 import sys
 import subprocess

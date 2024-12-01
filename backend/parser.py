@@ -1,5 +1,5 @@
-from lexer import *
-from emitter import *
+from backend.lexer import *
+from backend.emitter import *
 
 class parser:
     def __init__(self, lexer, emitter):
@@ -66,8 +66,8 @@ class parser:
         self.emitter.headerLine("#include <stdlib.h>")
         self.emitter.headerLine("int main() {")
         while not self.checkToken(TokenType.EOF):
-            if (self.currLine + 1) in self.gotoed:  # the while logic
-                self.emitter.emit("}")
+            if (self.currLine) in self.gotoed:  # the while logic
+                self.emitter.emitLine("}")
             self.statement()
             self.currLine += 1
         if self.defVar != []:
@@ -99,11 +99,13 @@ class parser:
                     break
                 currToken = tempLexObj.getToken().tokenKind
 
-            if isGoto: self.emitter.emit("while(")
+            if isGoto: self.emitter.emit("while(!(")
             else: self.emitter.emit("if(")
             self.comparison()
             self.matchToken(TokenType.THEN)
-            self.emitter.emit(") {")
+            if isGoto: self.emitter.emit(")) {")
+            else:
+                self.emitter.emit(") {")
             if any([self.checkToken(TokenType.GOTO), self.checkToken(TokenType.LET), self.checkToken(TokenType.PRINT)]):
                 self.alreadyNewLine = True
                 self.statement()
