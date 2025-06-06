@@ -11,12 +11,15 @@ This is tiny compiler of simple pseudo-code
 
 ## Syntax
 
-Key wrods:
+Key words:
 - `GOTO [line number]` - jump to line of `line number`
 - `LET [variable]` - define variable
 - `IF [condition] THEN [instruction]` - if statement 
 - `PRINT [varaible/text]` - print out
 - `END` - end the program (must be specified at the end of the program)
+
+Operators:
+`=, +, -, *, /, sqrt, ==, !=, <, <=, >, =>`
 
 ## Overview
 
