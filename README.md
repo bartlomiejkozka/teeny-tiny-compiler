@@ -2,11 +2,21 @@
 This is tiny compiler of simple pseudo-code
 
 ## Table of Contents
+0. [Pseudo-code Syntax](#syntax)
 1. [Overview](#overview)
 2. [Prerequisites](#prerequisites)
 3. [Installation](#installation)
 4. [Running the Application](#running-the-application)
 5. [Using a Virtual Environment (Optional)](#using-a-virtual-environment-optional)
+
+## Syntax
+
+Key wrods:
+- `GOTO [line number]` - jump to line of `line number`
+- `LET [variable]` - define variable
+- `IF [condition] THEN [instruction]` - if statement 
+- `PRINT [varaible/text]` - print out
+- `END` - end the program (must be specified at the end of the program)
 
 ## Overview
 
